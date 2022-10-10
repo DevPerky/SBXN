@@ -6,7 +6,7 @@
 typedef HMODULE LibHandle;
 #endif
 
-LibHandle loadDll(const char *fileName) {
+LibHandle shared_lib_load(const char *fileName) {
 #ifdef _WIN32
     return LoadLibraryA(fileName);
 #endif
