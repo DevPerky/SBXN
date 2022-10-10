@@ -10,8 +10,12 @@ LibHandle shared_lib_load(const char *fileName) {
 #ifdef _WIN32
     return LoadLibraryA(fileName);
 #endif
+}
 
-
+void *shared_lib_get_proc(LibHandle libHandle, const char *procName) {
+#ifdef _WIN32
+    return GetProcAddress(libHandle, procName);
+#endif
 }
 
 
