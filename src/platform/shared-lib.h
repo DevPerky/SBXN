@@ -1,5 +1,6 @@
 #ifndef SHARED_LIB_H
 #define SHARED_LIB_H
+#include "sbxn/sbxn.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -8,14 +9,23 @@ typedef FILETIME FileTime;
 #endif
 
 typedef struct {
-    LibHandle handle;
-    FileTime loadTime;
+    LibHandle   handle;
+    FileTime    loadTime;
+
+    SbxInit     *initFunc;
+    SbxUpdate   *updateFunc;
 }ClientLibrary;
 
 
 LibHandle shared_lib_load(const char *fileName) {
 #ifdef _WIN32
     return LoadLibraryA(fileName);
+#endif
+}
+
+void *shared_lib_get_proc(LibHandle libHandle, const char *procName) {
+#ifdef _WIN32
+    return GetProcAddress(libHandle, procName);
 #endif
 }
 
@@ -38,16 +48,13 @@ int shared_lib_load_or_reload(ClientLibrary *library, const char *fileName) {
 
         library->handle = shared_lib_load(tempFileName);
         library->loadTime = touchTime;
+        library->initFunc = shared_lib_get_proc(library->handle, XSTR(SBX_INIT_NAME));
+        library->updateFunc = shared_lib_get_proc(library->handle, XSTR(SBX_UPDATE_NAME));
+        
         return 1;
     }
     
     return 0;
-#endif
-}
-
-void *shared_lib_get_proc(LibHandle libHandle, const char *procName) {
-#ifdef _WIN32
-    return GetProcAddress(libHandle, procName);
 #endif
 }
 

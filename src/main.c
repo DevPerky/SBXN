@@ -9,10 +9,10 @@ void testPrint(const char *message) {
 
 int main(int argc, const char **argv) {
     SbxArgs args = { 0 };
-    SbxArgsStatus argsStatus = sbx_args_parse(argc, argv, &args);
-    if(argsStatus != SBX_ARGS_VALID) {
+
+    if(sbx_args_parse(argc, argv, &args) != SBX_ARGS_VALID) {
         printf("%s\n", argv[1]);
-        return argsStatus;
+        return 1;
     }
 
     SbxApi api = {
@@ -23,9 +23,15 @@ int main(int argc, const char **argv) {
 
     while(1) {
         if(shared_lib_load_or_reload(&clientLib, args.libFileName)) {
-            sbx_init *initFunc = shared_lib_get_proc(clientLib.handle, XSTR(SBX_INIT_NAME));
-            initFunc(&api);
+            if(clientLib.initFunc) {
+                clientLib.initFunc(&api);
+            }
         }
+
+        if(clientLib.updateFunc) {
+            clientLib.updateFunc(100);
+        }
+
         Sleep(100);
     }
 
