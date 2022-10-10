@@ -1,6 +1,6 @@
 #include "platform/platform.h"
 #include "sbx-args.h"
-#include "sbxn.h"
+#include "sbxn/sbxn.h"
 #define STR(X) #X
 
 int main(int argc, const char **argv) {
