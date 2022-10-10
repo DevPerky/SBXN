@@ -1,5 +1,6 @@
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#ifndef SHARED_LIB_H
+#define SHARED_LIB_H
+
 #ifdef _WIN32
 #include <Windows.h>
 typedef HMODULE LibHandle;
