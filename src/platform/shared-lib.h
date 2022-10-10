@@ -8,6 +8,18 @@ typedef HMODULE LibHandle;
 typedef FILETIME FileTime;
 #endif
 
+const char *tempLibFileName = "lib_temp.dll";
+
+typedef enum {
+    SHARED_LIB_NOT_FOUND,
+    SHARED_LIB_NEW,
+    SHARED_LIB_SAME,
+    SHARED_LIB_FAIL_COPY,
+    SHARED_LIB_FAIL_LOAD,
+    SHARED_LIB_INIT_NOT_FOUND,
+    SHARED_LIB_UPDATE_NOT_FOUND
+}SharedLibLoadStatus;
+
 typedef struct {
     LibHandle   handle;
     FileTime    loadTime;
@@ -23,20 +35,16 @@ LibHandle shared_lib_load(const char *fileName) {
 #endif
 }
 
-void *shared_lib_get_proc(LibHandle libHandle, const char *procName) {
-#ifdef _WIN32
-    return GetProcAddress(libHandle, procName);
-#endif
-}
-
-int shared_lib_load_or_reload(ClientLibrary *library, const char *fileName) {
+SharedLibLoadStatus shared_lib_load_or_reload(ClientLibrary *library, const char *fileName) {
 #ifdef _WIN32
 
-    const char *tempFileName = "lib_temp.dll";
     FILETIME touchTime = { 0 };
     WIN32_FIND_DATA findData;
     
-    FindFirstFileA(fileName, &findData);
+    if(FindFirstFileA(fileName, &findData) == INVALID_HANDLE_VALUE) {
+        return SHARED_LIB_NOT_FOUND;
+    }
+
     touchTime = findData.ftLastWriteTime;
 
     if(CompareFileTime(&(library->loadTime), &touchTime) != 0) {
@@ -44,17 +52,30 @@ int shared_lib_load_or_reload(ClientLibrary *library, const char *fileName) {
             FreeLibrary(library->handle);
         }
 
-        CopyFileA(fileName, tempFileName, 0);
+        if(!CopyFileA(fileName, tempLibFileName, 0)) {
+            return SHARED_LIB_FAIL_COPY;
+        }
 
-        library->handle = shared_lib_load(tempFileName);
+        library->handle = shared_lib_load(tempLibFileName);
+        if(library->handle == INVALID_HANDLE_VALUE) {
+            return SHARED_LIB_FAIL_LOAD;
+        }
+
         library->loadTime = touchTime;
-        library->initFunc = shared_lib_get_proc(library->handle, XSTR(SBX_INIT_NAME));
-        library->updateFunc = shared_lib_get_proc(library->handle, XSTR(SBX_UPDATE_NAME));
+        library->initFunc = (SbxInit*)GetProcAddress(library->handle, XSTR(SBX_UPDATE_NAME));
+        if(!library->initFunc) {
+            return SHARED_LIB_INIT_NOT_FOUND;
+        }
         
-        return 1;
+        library->updateFunc = (SbxUpdate*)GetProcAddress(library->handle, XSTR(SBX_UPDATE_NAME));
+        if(!library->updateFunc) {
+            return SHARED_LIB_UPDATE_NOT_FOUND;
+        }
+        
+        return SHARED_LIB_NEW;
     }
     
-    return 0;
+    return SHARED_LIB_SAME;
 #endif
 }
 
