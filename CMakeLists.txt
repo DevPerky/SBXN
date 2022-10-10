@@ -13,6 +13,10 @@ add_library(test SHARED
     test/test_main.c
 )
 
+target_include_directories(sbxn PUBLIC
+    src
+)
+
 target_include_directories(test PUBLIC
     src/sbxn
 )
