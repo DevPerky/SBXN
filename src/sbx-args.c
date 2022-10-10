@@ -8,4 +8,5 @@ SbxArgsStatus sbx_args_parse(int argc, const char **argv, SbxArgs *args) {
     }
 
     args->libFileName = argv[1];
+    return SBX_ARGS_VALID;
 }
