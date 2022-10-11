@@ -16,6 +16,7 @@ typedef enum {
     SHARED_LIB_SAME,
     SHARED_LIB_FAIL_COPY,
     SHARED_LIB_FAIL_LOAD,
+    SHARED_LIB_FAIL_FREE,
     SHARED_LIB_INIT_NOT_FOUND,
     SHARED_LIB_UPDATE_NOT_FOUND
 }SharedLibLoadStatus;
@@ -40,38 +41,43 @@ SharedLibLoadStatus shared_lib_load_or_reload(ClientLibrary *library, const char
 
     FILETIME touchTime = { 0 };
     WIN32_FIND_DATA findData;
-    
+
     if(FindFirstFileA(fileName, &findData) == INVALID_HANDLE_VALUE) {
         return SHARED_LIB_NOT_FOUND;
     }
 
-    touchTime = findData.ftLastWriteTime;
+    touchTime = findData.ftLastAccessTime;
 
-    if(CompareFileTime(&(library->loadTime), &touchTime) != 0) {
+    if(CompareFileTime(&(library->loadTime), &touchTime) < 0) {
+        Sleep(1);
         if(library->handle) {
-            FreeLibrary(library->handle);
+            if(!FreeLibrary(library->handle)) {
+                return SHARED_LIB_FAIL_FREE;
+            }
         }
 
         if(!CopyFileA(fileName, tempLibFileName, 0)) {
             return SHARED_LIB_FAIL_COPY;
         }
 
+        Sleep(100);
+
         library->handle = shared_lib_load(tempLibFileName);
-        if(library->handle == INVALID_HANDLE_VALUE) {
+        if(library->handle == NULL) {
             return SHARED_LIB_FAIL_LOAD;
         }
 
-        library->loadTime = touchTime;
-        library->initFunc = (SbxInit*)GetProcAddress(library->handle, XSTR(SBX_UPDATE_NAME));
-        if(!library->initFunc) {
+        library->initFunc = (SbxInit*)GetProcAddress(library->handle, XSTR(SBX_INIT_NAME));
+        if(library->initFunc == NULL) {
             return SHARED_LIB_INIT_NOT_FOUND;
         }
         
         library->updateFunc = (SbxUpdate*)GetProcAddress(library->handle, XSTR(SBX_UPDATE_NAME));
-        if(!library->updateFunc) {
+        if(library->updateFunc == NULL) {
             return SHARED_LIB_UPDATE_NOT_FOUND;
         }
         
+        library->loadTime = touchTime;
         return SHARED_LIB_NEW;
     }
     

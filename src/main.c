@@ -25,6 +25,7 @@ int main(int argc, const char **argv) {
         SharedLibLoadStatus status = shared_lib_load_or_reload(&clientLib, args.libFileName);
         switch(status) {
             case SHARED_LIB_NEW:
+                printf("Succesfully loaded %s\n", args.libFileName);
                 clientLib.initFunc(&api);
             break;
             case SHARED_LIB_FAIL_COPY:
@@ -32,6 +33,9 @@ int main(int argc, const char **argv) {
                 break;
             case SHARED_LIB_FAIL_LOAD:
                 fprintf(stderr, "Failed loading copy of file %s\n", args.libFileName);
+                break;
+            case SHARED_LIB_FAIL_FREE:
+                fprintf(stderr, "Failed loading %s, couldn't free %s\n", args.libFileName, tempLibFileName);
                 break;
             case SHARED_LIB_NOT_FOUND:
                 fprintf(stderr, "Couldn't find file %s\n", args.libFileName);
@@ -52,7 +56,7 @@ int main(int argc, const char **argv) {
             clientLib.updateFunc(10);
         }
         
-        Sleep(100);
+        Sleep(1);
     }
 
 }
