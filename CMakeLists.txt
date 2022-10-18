@@ -7,6 +7,8 @@ add_subdirectory(dependencies/GLFW)
 add_executable(sbxn
     src/main.c
     src/sbx-args.c
+    src/data-structures/vector.c
+    src/data-structures/gen-handle-array.c
 )
 
 add_library(test SHARED
