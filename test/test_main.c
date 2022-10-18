@@ -6,5 +6,5 @@ SBX_INIT(SBX_INIT_NAME) {
 }
 
 SBX_UPDATE(SBX_UPDATE_NAME) {
-    printf("delta %d\n", deltaTime);
+
 }
