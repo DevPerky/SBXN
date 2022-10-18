@@ -1,8 +1,11 @@
 #include "platform/platform.h"
 #include "sbx-args.h"
 #include "sbxn/sbxn.h"
+#include "data-structures/gen-handle-array.h"
 #include <stdio.h>
 #include <GLFW/glfw3.h>
+
+GhArray testGhArray = DS_GH_ARRAY_INIT(int);
 
 void testPrint(const char *message) {
     printf("SBX: %s\n", message);
@@ -16,10 +19,20 @@ int main(int argc, const char **argv) {
     }
 
     SbxApi api = {
-        .print = testPrint
+        .print = testPrint,
     };
 
     ClientLibrary clientLib = { 0 };
+    GenHandle handle;
+    ds_gh_array_allocate(&testGhArray, &handle);
+    ds_gh_array_free(&testGhArray, handle);
+    ds_gh_array_allocate(&testGhArray, &handle);
+    ds_gh_array_free(&testGhArray, handle);
+    ds_gh_array_allocate(&testGhArray, &handle);
+    ds_gh_array_free(&testGhArray, handle);
+    ds_gh_array_allocate(&testGhArray, &handle);
+    ds_gh_array_free(&testGhArray, handle);
+    
 
     while(1) {
         SharedLibLoadStatus status = shared_lib_load_or_reload(&clientLib, args.libFileName);

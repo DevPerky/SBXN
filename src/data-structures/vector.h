@@ -15,6 +15,7 @@ typedef struct {
 
 #define DS_VEC_INIT(type) { .DS_ELEMENT_SIZE_NAME = sizeof(type) }
 #define DS_VEC_FRONT(dsVec, type) ( ((type*)dsVec.data)[dsVec.size-1] )
+#define DS_VEC_AT(dsVec, type, index) ( ((type*)dsVec.data)[index] )
 
 DataStructureStatus ds_vec_push(Vector *vector, void *data);
 DataStructureStatus ds_vec_pop(Vector *vector);
