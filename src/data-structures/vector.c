@@ -15,7 +15,12 @@ DataStructureStatus ds_vec_push(Vector *vector, void *data) {
         }
     }
 
-    memcpy(&(vector->data[vector->size]), data, vector->elementSize);
+    if(data != NULL) {
+        memcpy(((char*)vector->data) + vector->size * vector->elementSize, data, vector->elementSize);
+    }
+    else {
+        ds_vec_memset(vector, vector->size, 0);
+    }
     
     vector->size++;
     return DS_OK;
@@ -36,13 +41,13 @@ DataStructureStatus ds_vec_pop(Vector *vector) {
 
 DataStructureStatus ds_vec_resize(Vector *vector, size_t newSize) {
     if(vector->data == NULL) {
-        vector->data = (uint8_t*)malloc(newSize * vector->elementSize);
+        vector->data = malloc(newSize * vector->elementSize);
         if(vector->data == NULL) {
             return DS_FAIL_ALLOC;
         }
     }
     else {
-        vector->data = (uint8_t*)realloc(vector->data, newSize * vector->elementSize);
+        vector->data = realloc(vector->data, newSize * vector->elementSize);
         if(vector->data == NULL) {
             return DS_FAIL_ALLOC;
         }
@@ -50,4 +55,21 @@ DataStructureStatus ds_vec_resize(Vector *vector, size_t newSize) {
 
     vector->capacity = newSize;
     return DS_OK;
+}
+
+DataStructureStatus ds_vec_set(Vector *vector, size_t index, void *data) {
+    if(index > vector->size - 1) {
+        return DS_OUT_OF_BOUNDS;
+    }
+
+    memcpy((char*)vector->data + index * vector->elementSize, data, vector->elementSize);
+    return DS_OK;
+}
+
+DataStructureStatus ds_vec_memset(Vector *vector, size_t index, int value) {
+    if(index > vector->size - 1) {
+        return DS_OUT_OF_BOUNDS;
+    }
+
+    memset((char*)vector->data + index * vector->elementSize, value, vector->elementSize);
 }
