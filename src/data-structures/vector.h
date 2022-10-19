@@ -20,7 +20,7 @@ typedef struct {
 DataStructureStatus ds_vec_push(Vector *vector, void *data);
 DataStructureStatus ds_vec_pop(Vector *vector);
 DataStructureStatus ds_vec_resize(Vector *vector, size_t newSize);
-DataStructureStatus ds_vec_set(Vector *vector, size_t index, void *data);
+DataStructureStatus ds_vec_write(Vector *vector, size_t index, void *data);
 DataStructureStatus ds_vec_memset(Vector *vector, size_t index, int value);
 
 

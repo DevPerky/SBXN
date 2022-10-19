@@ -5,7 +5,8 @@ typedef enum {
     DS_FAIL_ALLOC,
     DS_EMPTY,
     DS_OUT_OF_BOUNDS,
-    DS_INVALID
+    DS_INVALID,
+    DS_NULL_REFERENCE
 }DataStructureStatus;
 
 #endif

@@ -30,6 +30,9 @@ typedef struct {
 
 DataStructureStatus ds_gh_array_allocate(GhArray *ghArray, GenHandle *handle);
 DataStructureStatus ds_gh_array_free(GhArray *ghArray, GenHandle handle);
+void *ds_gh_array_dereference(GhArray *ghArray, GenHandle handle);
+DataStructureStatus ds_gh_array_write(GhArray *ghArray, GenHandle handle, void *data);
+
 
 
 #endif

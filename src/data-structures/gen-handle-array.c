@@ -1,6 +1,7 @@
 #include "gen-handle-array.h"
 #include <assert.h>
 #include <stdlib.h>
+#include <memory.h>
 
 DataStructureStatus ds_gh_array_allocate(GhArray *ghArray, GenHandle *handle) {
     if(ghArray->freeList == NULL) {
@@ -16,7 +17,7 @@ DataStructureStatus ds_gh_array_allocate(GhArray *ghArray, GenHandle *handle) {
         GenHandleFreeList *nextFree = ghArray->freeList->next;
         free(ghArray->freeList);
         ghArray->freeList = nextFree;
-        
+
         ds_vec_memset(&ghArray->dataVec, newHandle.index, 0);
         *handle = newHandle;
         return DS_OK;
@@ -46,4 +47,28 @@ DataStructureStatus ds_gh_array_free(GhArray *ghArray, GenHandle handle) {
 
     return DS_OK;
 }
+
+void *ds_gh_array_dereference(GhArray *ghArray, GenHandle handle) {
+    if(handle.index >= ghArray->dataVec.size) {
+        return NULL;
+    }
+
+    if(handle.generation != DS_VEC_AT(ghArray->handleVec, GenHandle, handle.index).generation) {
+        return NULL;
+    }
+
+    return (char*)ghArray->dataVec.data + handle.index * ghArray->dataVec.elementSize;
+}
+
+DataStructureStatus ds_gh_array_write(GhArray *ghArray, GenHandle handle, void *data) {
+    void *dest = ds_gh_array_dereference(ghArray, handle);
+    if(dest == NULL) {
+        return DS_NULL_REFERENCE;
+    }
+
+    memcpy(dest, data, ghArray->dataVec.elementSize);
+    return DS_OK;
+}
+
+
 

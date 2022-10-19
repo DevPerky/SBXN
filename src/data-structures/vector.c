@@ -57,7 +57,7 @@ DataStructureStatus ds_vec_resize(Vector *vector, size_t newSize) {
     return DS_OK;
 }
 
-DataStructureStatus ds_vec_set(Vector *vector, size_t index, void *data) {
+DataStructureStatus ds_vec_write(Vector *vector, size_t index, void *data) {
     if(index > vector->size - 1) {
         return DS_OUT_OF_BOUNDS;
     }
