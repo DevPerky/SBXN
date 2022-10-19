@@ -4,7 +4,7 @@
 typedef void (*SbxPrint)(const char *message);
 
 typedef struct {
-    SbxPrint print;
+    
 }SbxApi;
 
 #define XSTR(X) STR(X)

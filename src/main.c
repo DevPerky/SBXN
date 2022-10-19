@@ -2,6 +2,7 @@
 #include "sbx-args.h"
 #include "sbxn/sbxn.h"
 #include "data-structures/gen-handle-array.h"
+#include "sbxn/sbxn-internal.h"
 #include <stdio.h>
 #include <GLFW/glfw3.h>
 
@@ -18,9 +19,8 @@ int main(int argc, const char **argv) {
         return 1;
     }
 
-    SbxApi api = {
-        .print = testPrint,
-    };
+    SbxApi api = { 0 };
+    sbxn_api_load(&api);
 
     ClientLibrary clientLib = { 0 };
     GenHandle handle, handle2;
