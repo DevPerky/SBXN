@@ -23,16 +23,21 @@ int main(int argc, const char **argv) {
     };
 
     ClientLibrary clientLib = { 0 };
-    GenHandle handle;
-    ds_gh_array_allocate(&testGhArray, &handle);
-    ds_gh_array_free(&testGhArray, handle);
-    ds_gh_array_allocate(&testGhArray, &handle);
-    ds_gh_array_free(&testGhArray, handle);
-    ds_gh_array_allocate(&testGhArray, &handle);
-    ds_gh_array_free(&testGhArray, handle);
-    ds_gh_array_allocate(&testGhArray, &handle);
-    ds_gh_array_free(&testGhArray, handle);
-    
+    GenHandle handle, handle2;
+    DataStructureStatus testStatus;
+    int testInt = 10;
+    int testInt2 = 20;
+    testStatus = ds_gh_array_allocate(&testGhArray, &handle);
+    testStatus = ds_gh_array_allocate(&testGhArray, &handle2);
+
+    testStatus = ds_gh_array_free(&testGhArray, handle);
+
+    testStatus = ds_gh_array_write(&testGhArray, handle2, &testInt2);
+    testStatus = ds_gh_array_write(&testGhArray, handle, &testInt);
+    testStatus = ds_gh_array_allocate(&testGhArray, &handle);
+    testStatus = ds_gh_array_write(&testGhArray, handle, &testInt);
+    testInt = *(int*)ds_gh_array_dereference(&testGhArray, handle);
+    testInt2 = *(int*)ds_gh_array_dereference(&testGhArray, handle2);
 
     while(1) {
         SharedLibLoadStatus status = shared_lib_load_or_reload(&clientLib, args.libFileName);
