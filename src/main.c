@@ -44,7 +44,7 @@ int main(int argc, const char **argv) {
         switch(status) {
             case SHARED_LIB_NEW:
                 printf("Succesfully loaded %s\n", args.libFileName);
-                clientLib.initFunc(&api);
+                clientLib.initFunc(api);
             break;
             case SHARED_LIB_FAIL_COPY:
                 fprintf(stderr, "Failed copying %s to %s\n", args.libFileName, tempLibFileName);
